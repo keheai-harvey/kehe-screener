@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>科禾 Kehe — 跨境对手方制裁核查（免费）</title>
+<meta name="description" content="免费查询境外客户/供应商是否在 OFAC、欧盟、英国、联合国制裁名单。跨境付款前先查一查，10 万+ 官方条目，浏览器即时出结果。">
+<link rel="canonical" href="https://keheai-harvey.github.io/kehe-screener/zh.html">
+<style>
+  :root { --ink:#1a2233; --accent:#2f6fed; --bg:#f7f8fb; --line:#e4e7ef; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; color:var(--ink); background:var(--bg); line-height:1.7; }
+  .wrap { max-width:760px; margin:0 auto; padding:48px 24px 72px; }
+  header { text-align:center; margin-bottom:32px; }
+  .logo { font-weight:700; font-size:22px; } .logo span { color:var(--accent); }
+  .tag { color:#6b7385; font-size:14px; margin-top:4px; }
+  h1 { font-size:30px; line-height:1.3; margin:10px 0 12px; }
+  .lead { color:#4a5265; font-size:16px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:28px; margin:24px 0; box-shadow:0 2px 10px rgba(20,30,60,.04); }
+  .card h2 { font-size:18px; margin-bottom:8px; }
+  .card p { color:#4a5265; font-size:15px; }
+  .qrow { display:flex; gap:10px; margin-top:16px; }
+  input[type=text] { flex:1; padding:12px 14px; font-size:15px; border:1px solid var(--line); border-radius:8px; min-width:0; }
+  button { padding:12px 22px; font-size:15px; font-weight:600; color:#fff; background:var(--accent); border:none; border-radius:8px; cursor:pointer; white-space:nowrap; }
+  button:hover { background:#2559c8; }
+  .fine { font-size:12px; color:#8a92a3; margin-top:12px; }
+  .fine2 { font-size:12px; color:#8a92a3; }
+  #results { margin-top:16px; }
+  .r-clean { background:#f0f7f0; border:1px solid #cfe5cf; border-radius:8px; padding:14px; font-size:14px; }
+  .r-hit { font-size:14px; margin-bottom:8px; color:#a33; }
+  .r-card { border:1px solid var(--line); border-left:4px solid #c0392b; border-radius:8px; padding:10px 12px; margin-bottom:8px; font-size:14px; }
+  .tag { color:#fff; border-radius:4px; padding:2px 8px; font-size:11px; font-weight:700; }
+  .tag2 { background:#eee; border-radius:4px; padding:2px 8px; font-size:11px; color:#555; margin-left:4px; }
+  .r-name { font-weight:600; margin-top:6px; }
+  .r-regime { font-size:12px; color:#666; }
+  .cta { text-align:center; background:#fff; border:1px solid var(--line); border-radius:12px; padding:24px; margin-top:24px; }
+  .cta a { display:inline-block; margin:8px 6px; padding:12px 22px; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; }
+  .disclaim { font-size:11px; color:#98a0b0; text-align:center; margin-top:24px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">科禾 <span>Kehe</span></div>
+    <div class="tag">跨境对手方核查 · 付款前先查</div>
+    <h1>要打款的境外客户/供应商，在制裁名单上吗？</h1>
+    <p class="lead">输入公司英文名，即时查询 OFAC（美国）、欧盟、英国、联合国四库制裁名单——免费、秒出、无需注册。</p>
+  </header>
+
+  <div class="card">
+    <h2>免费即时制裁筛查</h2>
+    <p>给新客户/新供应商打款前查一下：命中名单=高风险，未命中≠绝对安全（建议配合完整报告）。</p>
+    <div class="qrow">
+      <input type="text" id="q" placeholder="例如：Shenzhen Ruixiang Trading Co." autocomplete="off">
+      <button id="go">免费查询</button>
+    </div>
+    <div class="fine" id="idx-status">正在加载制裁数据库…</div>
+    <div id="results"></div>
+  </div>
+
+  <div class="cta">
+    <p><b>需要完整核查报告？</b></p>
+    <a href="https://creem.io/product/prod_49cInEWJJsDdyxOTLcIdOI" style="background:#2f6fed;">快速筛查 $19（24h）</a>
+    <a href="https://creem.io/product/prod_4AUjMB9Y3TslulN7zYQByZ" style="background:#1a2233;">完整核查报告 $100（中英双语24h）</a>
+    <a href="https://creem.io/product/prod_5u4xrCNUd6pUjKkXWFFrgp" style="background:#6f42c1;">中国供应商核验 $120（英文72h）</a>
+    <p class="fine2" style="margin-top:10px;">中文报告可加微信/邮箱沟通；下单后回复邮件告知要核查的公司名即可。</p>
+  </div>
+
+  <p class="disclaim">本查询为信息提示工具，非法律意见或合规结论；未命中≠清白。数据来自官方公开名单，查询结果仅用于风险提示。</p>
+</div>
+<script>
+let INDEX = null;
+const loading = document.getElementById('idx-status');
+async function loadIndex() {
+  try {
+    loading.textContent = '正在加载制裁数据库（10万+条目，约1.5MB）…';
+    const res = await fetch('data/sanctions_index.json.gz');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const buf = await res.arrayBuffer();
+    const ds = new DecompressionStream('gzip');
+    const stream = new Blob([buf]).stream().pipeThrough(ds);
+    const text = await new Response(stream).text();
+    INDEX = JSON.parse(text);
+    loading.textContent = '制裁数据库已加载：' + Object.keys(INDEX).length.toLocaleString() + ' 条（OFAC/欧盟/英国/联合国）';
+  } catch (e) { loading.textContent = '数据库加载失败（' + e.message + '），请稍后重试。'; }
+}
+function norm(s) { return (s || '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, ' ').trim(); }
+function search(query) {
+  const q = norm(query);
+  if (!q || !INDEX) return { exact: [], contain: [] };
+  const exact = INDEX[q] || [];
+  const qWords = q.split(' ').filter(w => w.length > 2);
+  const contain = [];
+  if (qWords.length) {
+    let checked = 0;
+    for (const [k, v] of Object.entries(INDEX)) {
+      if (k === q) continue;
+      if (qWords.every(w => k.includes(w))) { for (const x of v) contain.push(Object.assign({ key: k }, x)); if (contain.length >= 8) break; }
+      if (++checked > 60000) break;
+    }
+  }
+  return { exact, contain };
+}
+function srcName(s) { return s === 'OFAC' ? '美国OFAC' : s === 'UK' ? '英国' : s === 'EU' ? '欧盟' : s === 'UN' ? '联合国' : s; }
+function render(r) {
+  const box = document.getElementById('results');
+  const total = r.exact.length + r.contain.length;
+  if (total === 0) {
+    box.innerHTML = '<div class="r-clean"><b>未命中 OFAC/欧盟/英国/联合国制裁名单。</b><br><span class="fine2">注意：未命中≠清白——付款前建议配合完整报告（注册/股权/涉诉核查）。</span></div>';
+    return;
+  }
+  let html = '<div class="r-hit"><b>命中 ' + total + ' 条官方制裁记录（风险提示）：</b></div>';
+  for (const h of r.exact) html += hitCard(h, '精确命中');
+  for (const h of r.contain.slice(0, 8)) html += hitCard(h, '疑似');
+  box.innerHTML = html;
+}
+function hitCard(h, tag) {
+  return '<div class="r-card"><span class="tag" style="background:' + (h.s === 'OFAC' ? '#c0392b' : h.s === 'UK' ? '#1e6f5c' : h.s === 'UN' ? '#6f42c1' : '#2f6fed') + '">' + srcName(h.s) + '</span> <span class="tag2">' + tag + '</span> <div class="r-name">' + escapeHtml(h.n) + '</div><div class="r-regime">' + escapeHtml(h.r || '') + '</div></div>';
+}
+function escapeHtml(s) { return (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
+document.getElementById('go').addEventListener('click', () => render(search(document.getElementById('q').value)));
+document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') render(search(document.getElementById('q').value)); });
+loadIndex();
+</script>
+</body>
+</html>
