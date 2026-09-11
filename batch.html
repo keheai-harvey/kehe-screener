@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kehe — Batch Sanctions Screener (free)</title>
+<meta name="description" content="Free batch screening of up to 50 counterparties against OFAC, UK, EU and UN sanctions lists. See hit counts instantly, order detailed reports for the ones that matter.">
+<link rel="canonical" href="https://keheai-harvey.github.io/kehe-screener/batch.html">
+<style>
+  :root { --ink:#1a2233; --accent:#2f6fed; --bg:#f7f8fb; --line:#e4e7ef; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.6; }
+  .wrap { max-width:760px; margin:0 auto; padding:48px 24px 72px; }
+  header { text-align:center; margin-bottom:28px; }
+  .logo { font-weight:700; font-size:22px; } .logo span { color:var(--accent); }
+  .tag { color:#6b7385; font-size:14px; margin-top:4px; }
+  h1 { font-size:26px; margin:10px 0 8px; }
+  .lead { color:#4a5265; font-size:15px; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:24px; margin:20px 0; }
+  textarea { width:100%; height:150px; padding:12px; font-size:14px; border:1px solid var(--line); border-radius:8px; font-family:inherit; resize:vertical; }
+  button { padding:12px 22px; font-size:15px; font-weight:600; color:#fff; background:var(--accent); border:none; border-radius:8px; cursor:pointer; }
+  button:hover { background:#2559c8; }
+  .fine { font-size:12px; color:#8a92a3; margin-top:10px; }
+  .r-card { border:1px solid var(--line); border-radius:8px; padding:10px 12px; margin:8px 0; font-size:14px; display:flex; justify-content:space-between; align-items:center; }
+  .hit { color:#c0392b; font-weight:600; }
+  .clean { color:#1e6f5c; font-weight:600; }
+  .cta { text-align:center; background:#fff; border:1px solid var(--line); border-radius:12px; padding:20px; margin-top:20px; }
+  .cta a { display:inline-block; margin:6px; padding:11px 20px; color:#fff; text-decoration:none; border-radius:8px; font-weight:600; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">科禾 <span>Kehe</span></div>
+    <div class="tag">Batch screener · up to 50 names, free</div>
+    <h1>Batch sanctions screen — hit counts in seconds</h1>
+    <p class="lead">Paste one company per line. We tell you <b>how many official sanctions hits</b> each name has (OFAC / UK / EU / UN). Detailed matches and full reports are paid — this gives you the triage for free.</p>
+  </header>
+
+  <div class="card">
+    <textarea id="names" placeholder="Shenzhen Ruixiang Trading Co.&#10;Global Logistics GmbH&#10;XYZ Freight Ltd"></textarea>
+    <div style="margin-top:12px;display:flex;gap:10px;align-items:center;">
+      <button id="go">Screen batch</button>
+      <button id="csv" style="background:#fff;color:var(--ink);border:1px solid var(--line);">Export CSV</button>
+      <span class="fine">≤50 names · runs in your browser · data stays local</span>
+    </div>
+    <div class="fine" id="idx-status">Loading sanctions database…</div>
+    <div id="results"></div>
+  </div>
+
+  <div class="cta">
+    <p><b>Hit found? Get the detail before you pay:</b></p>
+    <a href="https://creem.io/product/prod_49cInEWJJsDdyxOTLcIdOI" style="background:#2f6fed;">Quick Check $19</a>
+    <a href="https://creem.io/product/prod_4AUjMB9Y3TslulN7zYQByZ" style="background:#1a2233;">Full report $100</a>
+    <a href="https://creem.io/product/prod_5u4xrCNUd6pUjKkXWFFrgp" style="background:#6f42c1;">China supplier $120</a>
+  </div>
+</div>
+<script>
+let INDEX = null;
+const loading = document.getElementById('idx-status');
+async function loadIndex() {
+  try {
+    loading.textContent = 'Loading sanctions database (104k entries)…';
+    const res = await fetch('data/sanctions_index.json.gz');
+    if (!res.ok) throw new Error('HTTP ' + res.status);
+    const buf = await res.arrayBuffer();
+    const ds = new DecompressionStream('gzip');
+    const text = await new Response(new Blob([buf]).stream().pipeThrough(ds)).text();
+    INDEX = JSON.parse(text);
+    loading.textContent = 'Ready — ' + Object.keys(INDEX).length.toLocaleString() + ' indexed names (OFAC/UK/EU/UN).';
+  } catch (e) { loading.textContent = 'Database failed to load (' + e.message + '). Refresh to retry.'; }
+}
+const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, ' ').trim();
+function hitsFor(query) {
+  const q = norm(query);
+  if (!q || !INDEX) return 0;
+  const exact = (INDEX[q] || []).length;
+  if (exact) return exact;
+  const qWords = q.split(' ').filter(w => w.length > 2);
+  let contain = 0, checked = 0;
+  if (qWords.length) {
+    for (const [k, v] of Object.entries(INDEX)) {
+      if (k === q) continue;
+      if (qWords.every(w => k.includes(w))) contain += v.length;
+      if (++checked > 60000) break;
+    }
+  }
+  return contain;
+}
+function escapeHtml(s) { return (s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c])); }
+document.getElementById('go').addEventListener('click', () => {
+  const names = document.getElementById('names').value.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 50);
+  const box = document.getElementById('results');
+  if (!names.length) { box.innerHTML = '<div class="fine">Enter at least one name.</div>'; return; }
+  if (!INDEX) { box.innerHTML = '<div class="fine">Database still loading — wait a second and retry.</div>'; return; }
+  let html = '<div style="margin-top:14px;font-weight:600;">Results (' + names.length + ' names):</div>';
+  for (const n of names) {
+    const h = hitsFor(n);
+    html += '<div class="r-card"><span>' + escapeHtml(n) + '</span><span class="' + (h ? 'hit' : 'clean') + '">' + (h ? '⚠ ' + h + ' hit(s)' : '✓ clean') + '</span></div>';
+  }
+  html += '<div class="fine" style="margin-top:8px;">Clean screen ≠ safe. Hit counts only — order a report for exact matches, registration and ownership.</div>';
+  box.innerHTML = html;
+});
+document.getElementById('csv').addEventListener('click', () => {
+  const names = document.getElementById('names').value.split('\n').map(s => s.trim()).filter(Boolean).slice(0, 50);
+  if (!names.length || !INDEX) return;
+  const rows = ['name,hits'];
+  for (const n of names) rows.push('"' + n.replace(/"/g, '""') + '",' + hitsFor(n));
+  const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = 'kehe_batch_screen.csv'; a.click();
+});
+loadIndex();
+</script>
+</body>
+</html>
