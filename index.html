@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kehe — Pre-payment Counterparty Verification</title>
+<meta name="description" content="Free sanctions screening for cross-border trade. Check a supplier or counterparty against OFAC, EU and UK sanctions lists plus public records before you pay.">
+<style>
+  :root { --ink:#1a2233; --accent:#2f6fed; --bg:#f7f8fb; --line:#e4e7ef; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.6; }
+  .wrap { max-width:760px; margin:0 auto; padding:48px 24px 72px; }
+  header { text-align:center; margin-bottom:40px; }
+  .logo { font-weight:700; font-size:22px; letter-spacing:.5px; } .logo span { color:var(--accent); }
+  .tag { color:#6b7385; font-size:14px; margin-top:4px; }
+  h1 { font-size:32px; line-height:1.25; margin:8px 0 12px; }
+  .lead { color:#4a5265; font-size:17px; max-width:600px; margin:0 auto; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:28px; margin:32px 0; box-shadow:0 2px 10px rgba(20,30,60,.04); }
+  .card h2 { font-size:19px; margin-bottom:6px; }
+  .card p { color:#4a5265; font-size:15px; }
+  label { display:block; font-weight:600; font-size:14px; margin:14px 0 6px; }
+  input[type=text], input[type=email] { width:100%; padding:12px 14px; font-size:15px; border:1px solid var(--line); border-radius:8px; }
+  button { width:100%; margin-top:18px; padding:14px; font-size:16px; font-weight:600; color:#fff; background:var(--accent); border:none; border-radius:8px; cursor:pointer; }
+  button:hover { background:#2559c8; }
+  .fine { font-size:12px; color:#8a92a3; margin-top:12px; text-align:center; }
+  .steps { display:flex; gap:16px; margin:32px 0; flex-wrap:wrap; }
+  .step { flex:1; min-width:180px; background:#fff; border:1px solid var(--line); border-radius:10px; padding:18px; }
+  .step b { display:block; margin-bottom:4px; }
+  .step span { font-size:13px; color:#4a5265; }
+  .cta { text-align:center; background:#fff; border:1px solid var(--line); border-radius:12px; padding:28px; }
+  .cta a { display:inline-block; margin-top:12px; padding:13px 26px; background:var(--ink); color:#fff; text-decoration:none; border-radius:8px; font-weight:600; }
+  .disclaim { font-size:11px; color:#98a0b0; text-align:center; margin-top:28px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="logo">Kehe<span>.</span></div>
+    <div class="tag">Cross-border counterparty verification</div>
+    <h1>Is your supplier on a sanctions list?</h1>
+    <p class="lead">Type a company name. We'll check it against OFAC, EU and UK sanctions lists and public records — free.</p>
+  </header>
+
+  <div class="card">
+    <h2>Free screening</h2>
+    <p>Wiring money to a new supplier? A two-minute check now beats a frozen payment or a surprise compliance problem later. No account needed.</p>
+    <form method="POST" action="https://formsubmit.co/1138833282@qq.com">
+      <input type="hidden" name="_subject" value="[Kehe] Free screening request">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://keheai-harvey.github.io/kehe-screener/thanks.html">
+      <label for="company">Company name to check *</label>
+      <input type="text" id="company" name="company" placeholder="e.g. Shenzhen Ruixiang Trading Co." required>
+      <label for="email">Your email (for the result) *</label>
+      <input type="email" id="email" name="email" placeholder="you@company.com" required>
+      <button type="submit">Check it free</button>
+      <div class="fine">Free to run. Full reports are $100 and come with a copy you can file.</div>
+    </form>
+  </div>
+
+  <div class="steps">
+    <div class="step"><b>1 · Submit</b><span>Type the supplier name you're about to pay.</span></div>
+    <div class="step"><b>2 · We check</b><span>OFAC, EU, UK sanctions lists and public registration records.</span></div>
+    <div class="step"><b>3 · You decide</b><span>Free hit-or-clean result by email; full report on demand.</span></div>
+  </div>
+
+  <div class="cta">
+    <p>Need the full picture — ownership, litigation, multi-list screening? Get the complete report.</p>
+    <a href="https://creem.io/product/prod_4AUjMB9Y3TslulN7zYQByZ" target="_blank" rel="noopener">Order full report — $100</a>
+  </div>
+
+  <p class="disclaim">This is a screening aid, not legal advice, and clearing the check does not guarantee a transaction is permitted — confirm your specific obligations with qualified counsel where it matters.</p>
+</div>
+</body>
+</html>
