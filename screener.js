@@ -1,4 +1,4 @@
-// Kehe free screener — client-side sanctions lookup (OFAC+UK+EU)
+﻿// Kehe free screener — client-side sanctions lookup (OFAC+UK+EU)
 let INDEX = null;
 const loading = document.getElementById('idx-status');
 
@@ -12,7 +12,7 @@ async function loadIndex() {
     const stream = new Blob([buf]).stream().pipeThrough(ds);
     const text = await new Response(stream).text();
     INDEX = JSON.parse(text);
-    loading.textContent = 'Sanctions database loaded: ' + Object.keys(INDEX).length.toLocaleString() + ' names (OFAC, UK, EU).';
+    loading.textContent = 'Sanctions database loaded: ' + Object.keys(INDEX).length.toLocaleString() + ' names (OFAC, UK, EU, UN).';
   } catch (e) {
     loading.textContent = 'Database failed to load (' + e.message + '). Check again later.';
   }
