@@ -12,7 +12,7 @@ async function loadIndex() {
     const stream = new Blob([buf]).stream().pipeThrough(ds);
     const text = await new Response(stream).text();
     INDEX = JSON.parse(text);
-    loading.textContent = 'Sanctions database loaded: ' + Object.keys(INDEX).length.toLocaleString() + ' names (OFAC, UK, EU, UN).';
+    loading.textContent = 'Sanctions database loaded: ' + Object.keys(INDEX).length.toLocaleString() + ' names (OFAC, UK, EU, UN, BIS).';
   } catch (e) {
     loading.textContent = 'Database failed to load (' + e.message + '). Check again later.';
   }
@@ -34,7 +34,7 @@ function search(query) {
         for (const x of v) contain.push(Object.assign({ key: k }, x));
         if (contain.length >= 8) break;
       }
-      if (++checked > 60000) break; // 性能保护
+      if (++checked > 80000) break; // 性能保护
     }
   }
   return { exact, contain };
