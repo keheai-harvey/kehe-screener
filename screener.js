@@ -45,6 +45,9 @@ function srcColor(s) { return s === 'OFAC' ? '#c0392b' : s === 'UK' ? '#1e6f5c' 
 function render(r) {
   const box = document.getElementById('results');
   const total = r.exact.length + r.contain.length;
+  const qv = (document.getElementById('q').value || '').trim();
+  const cap = document.getElementById('cap');
+  if (cap) { cap.style.display = 'block'; const cc = document.getElementById('cap-co'); if (cc) cc.value = qv; }
   const cta = '<div style="margin-top:14px;padding:12px 14px;background:#fff;border:1px solid #e4e7ef;border-radius:8px;font-size:14px;"><b>Need more than a name check?</b> Get exact matches, registration, ownership &amp; litigation — <a href="#order" style="color:#2f6fed;font-weight:600;">order the full report ($100)</a> or <a href="https://creem.io/product/prod_49cInEWJJsDdyxOTLcIdOI" style="color:#2f6fed;">Quick Check ($19)</a>.</div>';
   if (total === 0) {
     box.innerHTML = '<div class="r-clean"><b>No exact hit on OFAC, UK, EU or UN sanctions lists.</b><br><span class="fine2">Heads-up: a clean screen is not a guarantee — verify registration and ownership before you pay. Order the full report for the complete picture.</span></div>' + cta;
