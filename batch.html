@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kehe — Batch Sanctions Screener (free)</title>
-<meta name="description" content="Free batch screening of up to 50 counterparties against OFAC, UK, EU and UN sanctions lists. See hit counts instantly, order detailed reports for the ones that matter.">
+<meta name="description" content="Free batch screening of up to 50 counterparties against OFAC, UK, EU, UN and US BIS sanctions lists. See hit counts instantly, order detailed reports for the ones that matter.">
 <link rel="canonical" href="https://keheai-harvey.github.io/kehe-screener/batch.html">
 <style>
   :root { --ink:#1a2233; --accent:#2f6fed; --bg:#f7f8fb; --line:#e4e7ef; }
@@ -67,7 +67,7 @@ async function loadIndex() {
     const ds = new DecompressionStream('gzip');
     const text = await new Response(new Blob([buf]).stream().pipeThrough(ds)).text();
     INDEX = JSON.parse(text);
-    loading.textContent = 'Ready — ' + Object.keys(INDEX).length.toLocaleString() + ' indexed names (OFAC/UK/EU/UN).';
+    loading.textContent = 'Ready — ' + Object.keys(INDEX).length.toLocaleString() + ' indexed names (OFAC/UK/EU/UN/BIS).';
   } catch (e) { loading.textContent = 'Database failed to load (' + e.message + '). Refresh to retry.'; }
 }
 const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, ' ').trim();
