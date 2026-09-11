@@ -1,4 +1,4 @@
-﻿// Kehe free screener — client-side sanctions lookup (OFAC+UK+EU)
+// Kehe free screener — client-side sanctions lookup (OFAC+UK+EU)
 let INDEX = null;
 const loading = document.getElementById('idx-status');
 
@@ -40,13 +40,13 @@ function search(query) {
   return { exact, contain };
 }
 
-function srcColor(s) { return s === 'OFAC' ? '#c0392b' : s === 'UK' ? '#1e6f5c' : '#2f6fed'; }
+function srcColor(s) { return s === 'OFAC' ? '#c0392b' : s === 'UK' ? '#1e6f5c' : s === 'UN' ? '#6f42c1' : '#2f6fed'; }
 
 function render(r) {
   const box = document.getElementById('results');
   const total = r.exact.length + r.contain.length;
   if (total === 0) {
-    box.innerHTML = '<div class="r-clean"><b>No exact hit on OFAC, UK or EU sanctions lists.</b><br><span class="fine2">Heads-up: a clean screen is not a guarantee — verify registration and ownership before you pay. Order the full report for the complete picture.</span></div>';
+    box.innerHTML = '<div class="r-clean"><b>No exact hit on OFAC, UK, EU or UN sanctions lists.</b><br><span class="fine2">Heads-up: a clean screen is not a guarantee — verify registration and ownership before you pay. Order the full report for the complete picture.</span></div>';
     return;
   }
   let html = '<div class="r-hit"><b>' + total + ' name' + (total > 1 ? 's' : '') + ' flagged on official sanctions lists:</b></div>';
