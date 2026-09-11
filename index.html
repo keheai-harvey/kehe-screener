@@ -1,11 +1,42 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Kehe — Pre-payment Counterparty Verification</title>
-<meta name="description" content="Free sanctions screening for cross-border trade. Check a supplier or counterparty against OFAC, EU and UK sanctions lists before you pay.">
+<meta name="description" content="Free sanctions screening for cross-border trade. Check a supplier or counterparty against OFAC, UK, EU and UN sanctions lists before you pay.">
+<link rel="canonical" href="https://keheai-harvey.github.io/kehe-screener/">
+<meta property="og:title" content="Kehe — Pre-payment Counterparty Verification">
+<meta property="og:description" content="Free instant check against OFAC, UK, EU and UN sanctions lists. Full verification reports from $100.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://keheai-harvey.github.io/kehe-screener/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Kehe Sanctions Screener",
+  "url": "https://keheai-harvey.github.io/kehe-screener/",
+  "applicationCategory": "BusinessApplication",
+  "description": "Free instant counterparty screening against OFAC, UK, EU and UN sanctions lists, with full verification reports on demand.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@type": "Organization", "name": "Kehe", "url": "https://keheai-harvey.github.io/kehe-screener/" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Is the sanctions check really free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — the instant check against OFAC, UK, EU and UN sanctions lists is free, runs in your browser, and needs no account or credit card." } },
+    { "@type": "Question", "name": "What does the $100 verification report include?", "acceptedAnswer": { "@type": "Answer", "text": "Sanctions screening across OFAC, UK, EU and UN official lists, company registration and status, beneficial ownership layers where registers allow, litigation and enforcement flags, in a bilingual report delivered within 24 hours." } },
+    { "@type": "Question", "name": "How fast is the full report delivered?", "acceptedAnswer": { "@type": "Answer", "text": "Within 24 hours by email, with a 7-day refund if it does not help." } }
+  ]
+}
+</script>
 <style>
+  @media print { .no-print { display: none !important; } body { background: #fff; } .wrap { max-width: 100%; padding: 16px; } }
+  .print-btn { margin-top: 10px; background: #fff; color: var(--ink); border: 1px solid var(--line); padding: 8px 16px; font-size: 13px; border-radius: 8px; cursor: pointer; }
+  .print-btn:hover { background: #f2f4f9; }
   :root { --ink:#1a2233; --accent:#2f6fed; --bg:#f7f8fb; --line:#e4e7ef; }
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.6; }
@@ -61,6 +92,7 @@
     </div>
     <div class="fine" id="idx-status">Loading sanctions database…</div>
     <div id="results"></div>
+    <button class="print-btn no-print" onclick="window.print()">🖨 Save result as PDF / Print</button>
   </div>
 
   <div class="card">
