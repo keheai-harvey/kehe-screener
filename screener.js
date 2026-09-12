@@ -4,7 +4,7 @@ const loading = document.getElementById('idx-status');
 
 async function loadIndex() {
   try {
-    loading.textContent = 'Loading sanctions database (100k+ entries, ~1.5MB)...';
+    loading.textContent = 'Loading sanctions database (104k+ entries, ~1.5MB)...';
     const res = await fetch('data/sanctions_index.json.gz');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const buf = await res.arrayBuffer();
@@ -20,11 +20,16 @@ async function loadIndex() {
 
 function norm(s) { return (s || '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, ' ').trim(); }
 
+const SUF = ['ltd','limited','inc','corp','corporation','gmbh','ag','co','llc','bv','sa','plc','srl','pty','pte','holding','group','international','global'];
+
 function search(query) {
   const q = norm(query);
   if (!q || !INDEX) return { exact: [], contain: [] };
-  const exact = INDEX[q] || [];
-  const qWords = q.split(' ').filter(w => w.length > 2);
+  let exact = INDEX[q] || [];
+  const words = q.split(' ').filter(w => !SUF.includes(w));
+  const reduced = words.join(' ');
+  if (!exact.length && reduced !== q) exact = INDEX[reduced] || [];
+  const qWords = words.filter(w => w.length > 2);
   const contain = [];
   if (qWords.length) {
     let checked = 0;
