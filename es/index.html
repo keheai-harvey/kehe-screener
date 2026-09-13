@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kehe — Verificación de sanciones con cadena de evidencia auditable ($29)</title>
+<meta name="description" content="Un solo paso: pega un nombre de proveedor y obtén un informe auditable de cadena de evidencia en 40 segundos — OFAC, Reino Unido, UE, ONU y BIS — y decide. El informe de $29 incluye seguimiento de estado por 90 días.">
+<link rel="canonical" href="https://keheai-harvey.github.io/kehe-screener/es/">
+<meta property="og:title" content="Kehe — Informe de cadena de evidencia auditable ($29)">
+<meta property="og:image" content="https://keheai-harvey.github.io/kehe-screener/assets/og-cover.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:description" content="Pega un nombre de proveedor → informe auditable de cadena de evidencia en 40 segundos → informe completo con seguimiento de 90 días ($29).">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://keheai-harvey.github.io/kehe-screener/es/">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Kehe Sanctions Evidence-Chain Screener",
+  "url": "https://keheai-harvey.github.io/kehe-screener/",
+  "applicationCategory": "BusinessApplication",
+  "description": "Free instant counterparty screening across OFAC, UK, EU, UN and US BIS sanctions lists with an auditable evidence chain, plus a $29 full report including 90-day status monitoring.",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "publisher": { "@type": "Organization", "name": "Kehe", "url": "https://keheai-harvey.github.io/kehe-screener/" }
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    { "@type": "Question", "name": "Is the sanctions check really free?", "acceptedAnswer": { "@type": "Answer", "text": "Yes — the instant evidence-chain check against OFAC, UK, EU, UN and US BIS sanctions lists is free, runs in your browser, and needs no account or credit card." } },
+    { "@type": "Question", "name": "What does the $29 auditable report include?", "acceptedAnswer": { "@type": "Answer", "text": "An auditable evidence-chain report: exact and close match analysis across all five official lists, source links, data version and screen timestamp for a fileable paper trail, plus 90-day status monitoring — delivered by email within 24 hours." } },
+    { "@type": "Question", "name": "What is the 90-day monitoring?", "acceptedAnswer": { "@type": "Answer", "text": "If the screened entity's status changes on any checked list within 90 days, you get a status-change alert at no extra cost — your report stays usable, not stale." } }
+  ]
+}
+</script>
+<style>
+  @media print { .no-print { display: none !important; } body { background: #fff; } .wrap { max-width: 100%; padding: 16px; } }
+  .print-btn { margin-top: 10px; background: #fff; color: var(--ink); border: 1px solid var(--line); padding: 8px 16px; font-size: 13px; border-radius: 8px; cursor: pointer; }
+  .print-btn:hover { background: #f2f4f9; }
+  :root { --ink:#1a2233; --accent:#2f6fed; --bg:#f7f8fb; --line:#e4e7ef; --ok:#1e6f5c; --flag:#c0392b; }
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif; color:var(--ink); background:var(--bg); line-height:1.6; }
+  .wrap { max-width:720px; margin:0 auto; padding:48px 24px 72px; }
+  header { text-align:center; margin-bottom:28px; }
+  .logo { font-weight:700; font-size:22px; letter-spacing:.5px; } .logo span { color:var(--accent); }
+  .tag { color:#6b7385; font-size:14px; margin-top:4px; }
+  h1 { font-size:30px; line-height:1.25; margin:8px 0 12px; }
+  .lead { color:#4a5265; font-size:17px; max-width:600px; margin:0 auto; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:28px; margin:24px 0; box-shadow:0 2px 10px rgba(20,30,60,.04); }
+  .card h2 { font-size:19px; margin-bottom:6px; }
+  .card p { color:#4a5265; font-size:15px; }
+  .qrow { display:flex; gap:10px; margin-top:16px; }
+  input[type=text], input[type=email] { flex:1; padding:12px 14px; font-size:15px; border:1px solid var(--line); border-radius:8px; min-width:0; }
+  button { padding:12px 22px; font-size:15px; font-weight:600; color:#fff; background:var(--accent); border:none; border-radius:8px; cursor:pointer; white-space:nowrap; }
+  button:hover { background:#2559c8; }
+  .fine { font-size:13px; color:#5a6275; margin-top:12px; text-align:center; }
+  .fine2 { font-size:13px; color:#5a6275; }
+  #results { margin-top:16px; }
+  #results .report { background:#fff; border:1px solid var(--line); border-radius:10px; padding:20px; margin:6px 0; }
+  #results .rep-head { display:flex; justify-content:space-between; align-items:baseline; border-bottom:1px solid var(--line); padding-bottom:8px; margin-bottom:10px; }
+  #results .rep-head .logo { font-size:15px; letter-spacing:0; } #results .rep-head .logo span { color:var(--accent); }
+  #results .rep-head .meta { font-size:10.5px; color:#8a92a3; }
+  #results .verdict { padding:10px 12px; border-radius:6px; color:#fff; font-weight:600; font-size:14px; margin-bottom:10px; }
+  #results .verdict.ok { background:var(--ok); } #results .verdict.flag { background:var(--flag); }
+  #results .field { display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed #eef0f5; font-size:13px; }
+  #results .field b { font-weight:600; color:#4a5265; }
+  #results .evid-note { font-size:11.5px; color:#6b7385; margin-top:10px; }
+  #results .hits { margin-top:10px; }
+  #results .hit-row { padding:8px 10px; margin:4px 0; border-radius:6px; font-size:12.5px; background:#fdecea; border:1px solid #f5c6c0; }
+  #results .r-name { font-weight:600; } #results .r-regime { font-size:11.5px; color:#666; margin-top:2px; }
+  label { display:block; font-weight:600; font-size:14px; margin:14px 0 6px; }
+  .btn-wide { width:100%; margin-top:14px; }
+  .steps { display:flex; gap:16px; margin:24px 0; flex-wrap:wrap; }
+  .step { flex:1; min-width:180px; background:#fff; border:1px solid var(--line); border-radius:10px; padding:16px; }
+  .step b { display:block; margin-bottom:4px; } .step span { font-size:13px; color:#4a5265; }
+  .sub-cta { display:inline-block; padding:13px 26px; background:var(--accent); color:#fff; text-decoration:none; border-radius:8px; font-weight:600; }
+  .mon-note { font-size:12px; color:#4a5265; margin-top:8px; }
+  .disclaim { font-size:11px; color:#98a0b0; text-align:center; margin-top:28px; }
+  .langbar { display:flex; gap:8px; justify-content:center; margin-bottom:24px; }
+  .langbar a { padding:5px 12px; border:1px solid var(--line); border-radius:6px; text-decoration:none; color:#4a5265; font-size:13px; font-weight:600; background:#fff; }
+  .langbar a.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <nav class="langbar">
+    <a href="/kehe-screener/">EN</a>
+    <a href="/kehe-screener/es/" class="active">ES</a>
+    <a href="/kehe-screener/pt/">PT</a>
+    <a href="/kehe-screener/ar/">AR</a>
+  </nav>
+  <header>
+    <div class="logo">Kehe<span>.</span></div>
+    <div class="tag">Cribado de sanciones con cadena de evidencia auditable</div>
+    <h1>¿Va a pagar a un proveedor nuevo? Compruébelo primero.</h1>
+    <p class="lead">Escriba un nombre de empresa. Un informe auditable de cadena de evidencia contra OFAC, Reino Unido, UE, ONU y BIS de EE. UU. — en 40 segundos, gratis, aquí mismo.</p>
+  </header>
+
+  <div class="card">
+    <h2>1 · Pegue el nombre del proveedor</h2>
+    <p>¿Va a girar dinero a una contraparte nueva? Una comprobación de 40 segundos ahora le evita un pago congelado o un problema de cumplimiento después.</p>
+    <div class="qrow">
+      <input type="text" id="q" placeholder="p. ej. Shenzhen Ruixiang Trading Co." autocomplete="off">
+      <button id="go">Compruébelo gratis</button>
+    </div>
+    <div class="fine" id="idx-status">Cargando la base de datos de sanciones (más de 104.000 registros)…</div>
+  </div>
+
+  <div id="results"></div>
+
+  <div class="card no-print" id="leademail" style="display:none;">
+    <h2>2 · Su cadena de evidencia para archivar</h2>
+    <p>Guárdelo como registro documental. Introduzca su correo y le enviamos el informe auditable de cadena de evidencia (con versión de datos y sello de tiempo) para su expediente — gratis, sin spam, baja en un clic.</p>
+    <form method="POST" action="https://formsubmit.co/7d99cafa99b4704c4e2835114a41a9b7">
+      <input type="hidden" name="_subject" value="[Kehe] Solicitud del informe gratuito de cadena de evidencia">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://keheai-harvey.github.io/kehe-screener/thanks.html">
+      <input type="hidden" name="company" id="cap-co">
+      <label for="leadmail">Su correo electrónico</label>
+      <input type="email" id="leadmail" name="email" placeholder="usted@empresa.com" required>
+      <button type="submit" class="btn-wide">Enviar mi informe de cadena de evidencia</button>
+    </form>
+    <div class="fine2">Usamos su correo solo para enviarle el informe. No lo compartimos con terceros.</div>
+    <button class="print-btn no-print" onclick="window.print()" style="margin-top:14px;">🖨 Guardar resultado como PDF / Imprimir</button>
+  </div>
+
+  <div class="card no-print" id="suboffer" style="display:none;border-color:var(--accent);border-width:2px;">
+    <h2>3 · ¿Quiere el informe completo auditable? — $29</h2>
+    <p><b>Informe de cadena de evidencia auditable</b> va más allá del cribado gratuito: análisis de coincidencias exactas y cercanas fuera de listas, enlaces a fuentes oficiales para cada coincidencia y un rastro documental archivable. <b>Incluye seguimiento de estado por 90 días</b> — si cambia el estado de la entidad en cualquier lista dentro de 90 días, recibe una alerta sin coste adicional.</p>
+    <form method="POST" action="https://formsubmit.co/7d99cafa99b4704c4e2835114a41a9b7">
+      <input type="hidden" name="_subject" value="[Kehe] Solicitud del informe de $29">
+      <input type="hidden" name="_captcha" value="false">
+      <input type="hidden" name="_next" value="https://keheai-harvey.github.io/kehe-screener/thanks.html">
+      <input type="hidden" name="company" id="sub-co">
+      <label for="submail">Correo para recibir el informe</label>
+      <input type="email" id="submail" name="email" placeholder="you@company.com" required>
+      <button type="submit" class="btn-wide">Solicitar el informe de $29</button>
+      <div class="fine" style="margin-top:10px;">Después <a href="https://creem.io/product/prod_3JzLQsjq0656fM9aVRIFZW" target="_blank" rel="noopener" style="color:var(--accent);font-weight:600;">pague en Creem</a> · 7 días de reembolso si no responde su pregunta</div>
+    </form>
+    <div class="mon-note">El seguimiento de 90 días mantiene su informe útil, no obsoleto. Vea primero un <a href="sample-report.html" style="color:var(--accent);">informe de muestra</a>.</div>
+  </div>
+
+  <div class="steps no-print">
+    <div class="step"><b>1 · Pegue el nombre del proveedor</b><span>Comprobación gratuita e instantánea de cadena de evidencia en 40 s.</span></div>
+    <div class="step"><b>2 · Correo → informe archivable</b><span>Reciba la cadena de evidencia auditable en su bandeja de entrada.</span></div>
+    <div class="step"><b>3 · Informe completo de $29 + seguimiento de 90 días</b><span>Alertas de cambio de estado durante 90 días, sin coste extra.</span></div>
+  </div>
+
+  <div class="cta card no-print">
+    <p><b>¿Aún no lo tiene claro? Vea primero un informe de muestra</b> — y luego decida.</p>
+  </div>
+
+  <p class="disclaim">Kehe (Xian Kehe Information Technology Co., Ltd.) · <a href="privacy.html" style="color:#98a0b0;">Privacy</a> · <a href="terms.html" style="color:#98a0b0;">Terms</a> · <a href="faq.html" style="color:#98a0b0;">FAQ</a><br>This is an information compilation and risk indicator, not legal advice or a compliance conclusion. A clean screen does not guarantee a transaction is permitted — confirm your specific obligations with qualified counsel where it matters.</p>
+</div>
+<script src="/screener.js?v=20260913"></script>
+</body>
+</html>
