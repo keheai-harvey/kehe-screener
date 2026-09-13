@@ -62,7 +62,7 @@ function fillTpl(s, map) { return s.replace(/\{(\w+)\}/g, (m, k) => map[k] !== u
 async function loadIndex() {
   try {
     loading.textContent = t('loading');
-    const res = await fetch('/data/sanctions_index.json.gz');
+    const res = await fetch('/kehe-screener/data/sanctions_index.json.gz');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const buf = await res.arrayBuffer();
     const ds = new DecompressionStream('gzip');
