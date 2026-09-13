@@ -1,20 +1,77 @@
 // Kehe free screener — client-side sanctions lookup (OFAC+UK+EU)
+// I18N: dynamic report text switches on <html lang>. Static page copy lives in each lang's index.html.
+const I18N = {
+  en: {
+    loading: 'Loading sanctions database (104k+ entries, ~1.5MB)...',
+    loaded: 'Sanctions database loaded: {n} names (OFAC, UK, EU, UN, BIS).',
+    failed: 'Database failed to load ({m}). Check again later.',
+    verdictNoHit: 'No exact or close match on checked lists',
+    verdictHit: '{n} name{s} flagged on official lists',
+    fieldSubject: 'Subject checked', fieldLists: 'Lists checked',
+    fieldVersion: 'Data version', fieldTime: 'Screen time',
+    evidNote: 'Clean screen = no flag on these lists. It is <b>not</b> a guarantee — a true compliance file adds registration, ownership and re-check monitoring.',
+    meta: 'Auditable Evidence-Chain Screening',
+    tagExact: 'EXACT', tagPossible: 'POSSIBLE'
+  },
+  es: {
+    loading: 'Cargando la base de datos de sanciones (104k+ registros, ~1.5MB)...',
+    loaded: 'Base de datos cargada: {n} nombres (OFAC, UK, UE, ONU, BIS).',
+    failed: 'No se pudo cargar la base de datos ({m}). Inténtalo de nuevo más tarde.',
+    verdictNoHit: 'Sin coincidencias exactas ni cercanas en las listas consultadas',
+    verdictHit: '{n} nombre{s} marcado{s} en listas oficiales',
+    fieldSubject: 'Entidad verificada', fieldLists: 'Listas consultadas',
+    fieldVersion: 'Versión de datos', fieldTime: 'Fecha y hora del chequeo',
+    evidNote: 'Pantalla limpia = sin alerta en estas listas. <b>No</b> es una garantía — un expediente de cumplimiento real añade registro, titularidad y seguimiento continuo.',
+    meta: 'Chequeo de cadena de evidencia auditable',
+    tagExact: 'COINCIDENCIA EXACTA', tagPossible: 'POSIBLE'
+  },
+  pt: {
+    loading: 'Carregando banco de dados de sanções (104k+ registros, ~1.5MB)...',
+    loaded: 'Banco de dados carregado: {n} nomes (OFAC, Reino Unido, UE, ONU, BIS).',
+    failed: 'Não foi possível carregar o banco de dados ({m}). Tente novamente mais tarde.',
+    verdictNoHit: 'Sem correspondência exata ou aproximada nas listas consultadas',
+    verdictHit: '{n} nome{s} sinalizado{s} nas listas oficiais',
+    fieldSubject: 'Entidade verificada', fieldLists: 'Listas consultadas',
+    fieldVersion: 'Versão dos dados', fieldTime: 'Data e hora da verificação',
+    evidNote: 'Triagem limpa = sem sinalização nestas listas. <b>Não</b> é uma garantia — um dossiê real de compliance acrescenta registro, propriedade e monitoramento contínuo.',
+    meta: 'Verificação de cadeia de evidência auditável',
+    tagExact: 'CORRESPONDÊNCIA EXATA', tagPossible: 'POSSÍVEL'
+  },
+  ar: {
+    loading: 'جارٍ تحميل قاعدة بيانات العقوبات (104k+ سجلات، ~1.5MB)...',
+    loaded: 'تم تحميل قاعدة البيانات: {n} اسمًا (OFAC، المملكة المتحدة، الاتحاد الأوروبي، الأمم المتحدة، BIS).',
+    failed: 'تعذر تحميل قاعدة البيانات ({m}). حاول مرة أخرى لاحقًا.',
+    verdictNoHit: 'لا توجد تطابقات دقيقة أو قريبة في القوائم المدققة',
+    verdictHit: '{n} اسم مدرج في القوائم الرسمية',
+    fieldSubject: 'الكيان المدقَّق', fieldLists: 'القوائم المدققة',
+    fieldVersion: 'إصدار البيانات', fieldTime: 'وقت الفحص',
+    evidNote: 'شاشة نظيفة = لا يوجد تنبيه في هذه القوائم. <b>هذا ليس</b> ضمانًا — الملف الامتثالي الكامل يضيف السجل والملكية والمراقبة المستمرة.',
+    meta: 'فحص سلسلة الأدلة القابل للتدقيق',
+    tagExact: 'تطابق دقيق', tagPossible: 'احتمال'
+  }
+};
 let INDEX = null;
 const loading = document.getElementById('idx-status');
+function lang() {
+  const l = (document.documentElement.lang || '').toLowerCase().slice(0, 2);
+  return I18N[l] || I18N.en;
+}
+function t(key) { return lang()[key] || I18N.en[key] || key; }
+function fillTpl(s, map) { return s.replace(/\{(\w+)\}/g, (m, k) => map[k] !== undefined ? map[k] : m); }
 
 async function loadIndex() {
   try {
-    loading.textContent = 'Loading sanctions database (104k+ entries, ~1.5MB)...';
-    const res = await fetch('data/sanctions_index.json.gz');
+    loading.textContent = t('loading');
+    const res = await fetch('/data/sanctions_index.json.gz');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const buf = await res.arrayBuffer();
     const ds = new DecompressionStream('gzip');
     const stream = new Blob([buf]).stream().pipeThrough(ds);
     const text = await new Response(stream).text();
     INDEX = JSON.parse(text);
-    loading.textContent = 'Sanctions database loaded: ' + Object.keys(INDEX).length.toLocaleString() + ' names (OFAC, UK, EU, UN, BIS).';
+    loading.textContent = fillTpl(t('loaded'), { n: Object.keys(INDEX).length.toLocaleString() });
   } catch (e) {
-    loading.textContent = 'Database failed to load (' + e.message + '). Check again later.';
+    loading.textContent = fillTpl(t('failed'), { m: e.message });
   }
 }
 
@@ -61,28 +118,28 @@ function render(r) {
   let verdict, verdictCls;
   let bodyHtml;
   if (total === 0) {
-    verdict = '<div class="verdict ok">✓ NO FLAG — no exact or close match on checked lists</div>';
+    verdict = '<div class="verdict ok">✓ ' + t('verdictNoHit') + '</div>';
     verdictCls = 'ok';
-    bodyHtml = '<div class="field"><b>Subject checked</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
-      + '<div class="field"><b>Lists checked</b><span>OFAC · UK · EU · UN · BIS</span></div>'
-      + '<div class="field"><b>Data version</b><span>' + DB_TS + '</span></div>'
-      + '<div class="field"><b>Screen time</b><span>' + stamp + '</span></div>'
-      + '<div class="evid-note">Clean screen = no flag on these lists. It is <b>not</b> a guarantee — a true compliance file adds registration, ownership and re-check monitoring.</div>';
+    bodyHtml = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
+      + '<div class="field"><b>' + t('fieldLists') + '</b><span>OFAC · UK · EU · UN · BIS</span></div>'
+      + '<div class="field"><b>' + t('fieldVersion') + '</b><span>' + DB_TS + '</span></div>'
+      + '<div class="field"><b>' + t('fieldTime') + '</b><span>' + stamp + '</span></div>'
+      + '<div class="evid-note">' + t('evidNote') + '</div>';
   } else {
-    verdict = '<div class="verdict flag">⚠ ' + total + ' name' + (total > 1 ? 's' : '') + ' flagged on official lists</div>';
+    verdict = '<div class="verdict flag">⚠ ' + fillTpl(t('verdictHit'), { n: total, s: total > 1 ? (lang().tagExact === 'EXACT' ? 's' : '') : '' }) + '</div>';
     verdictCls = 'flag';
     let hits = '';
-    for (const h of r.exact) hits += hitCard(h, 'EXACT');
-    for (const h of r.contain.slice(0, 8)) hits += hitCard(h, 'POSSIBLE');
-    bodyHtml = '<div class="field"><b>Subject checked</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
-      + '<div class="field"><b>Lists checked</b><span>OFAC · UK · EU · UN · BIS</span></div>'
-      + '<div class="field"><b>Data version</b><span>' + DB_TS + '</span></div>'
-      + '<div class="field"><b>Screen time</b><span>' + stamp + '</span></div>'
+    for (const h of r.exact) hits += hitCard(h, t('tagExact'));
+    for (const h of r.contain.slice(0, 8)) hits += hitCard(h, t('tagPossible'));
+    bodyHtml = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
+      + '<div class="field"><b>' + t('fieldLists') + '</b><span>OFAC · UK · EU · UN · BIS</span></div>'
+      + '<div class="field"><b>' + t('fieldVersion') + '</b><span>' + DB_TS + '</span></div>'
+      + '<div class="field"><b>' + t('fieldTime') + '</b><span>' + stamp + '</span></div>'
       + '<div class="hits">' + hits + '</div>';
   }
 
   box.innerHTML = '<div class="report">'
-    + '<div class="rep-head"><div class="logo">Kehe<span>.</span></div><div class="meta">Auditable Evidence-Chain Screening · ' + stamp.slice(0, 10) + '</div></div>'
+    + '<div class="rep-head"><div class="logo">Kehe<span>.</span></div><div class="meta">' + t('meta') + ' · ' + stamp.slice(0, 10) + '</div></div>'
     + verdict + bodyHtml + '</div>';
 
   // —— 抓邮箱（投入点·紧跟结果出现）——
