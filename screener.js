@@ -47,25 +47,63 @@ function search(query) {
 
 function srcColor(s) { return s === 'OFAC' ? '#c0392b' : s === 'UK' ? '#1e6f5c' : s === 'UN' ? '#6f42c1' : '#2f6fed'; }
 
+// ⏱ 报告生成时间戳 + 数据版本（可审计证据链要素）
+const DB_TS = '2026-09-12T00:00:00Z';            // 官方名单同步时间（每次更新改此值）
+function nowStamp() { return new Date().toISOString(); }
+
 function render(r) {
   const box = document.getElementById('results');
   const total = r.exact.length + r.contain.length;
   const qv = (document.getElementById('q').value || '').trim();
-  const cap = document.getElementById('cap');
-  if (cap) { cap.style.display = 'block'; const cc = document.getElementById('cap-co'); if (cc) cc.value = qv; }
-  const cta = '<div style="margin-top:14px;padding:12px 14px;background:#fff;border:1px solid #e4e7ef;border-radius:8px;font-size:14px;"><b>Need more than a name check?</b> Get exact matches, registration, ownership &amp; litigation — <a href="#order" style="color:#2f6fed;font-weight:600;">order the full report ($100)</a> or <a href="https://creem.io/product/prod_49cInEWJJsDdyxOTLcIdOI" style="color:#2f6fed;">Quick Check ($19)</a>.</div>';
+
+  // —— 证据链报告（单路径 · 固定结构，内容随查询可变）——
+  const stamp = nowStamp();
+  let verdict, verdictCls;
+  let bodyHtml;
   if (total === 0) {
-    box.innerHTML = '<div class="r-clean"><b>No exact hit on OFAC, UK, EU or UN sanctions lists.</b><br><span class="fine2">Heads-up: a clean screen is not a guarantee — verify registration and ownership before you pay. Order the full report for the complete picture.</span></div>' + cta;
-    return;
+    verdict = '<div class="verdict ok">✓ NO FLAG — no exact or close match on checked lists</div>';
+    verdictCls = 'ok';
+    bodyHtml = '<div class="field"><b>Subject checked</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
+      + '<div class="field"><b>Lists checked</b><span>OFAC · UK · EU · UN · BIS</span></div>'
+      + '<div class="field"><b>Data version</b><span>' + DB_TS + '</span></div>'
+      + '<div class="field"><b>Screen time</b><span>' + stamp + '</span></div>'
+      + '<div class="evid-note">Clean screen = no flag on these lists. It is <b>not</b> a guarantee — a true compliance file adds registration, ownership and re-check monitoring.</div>';
+  } else {
+    verdict = '<div class="verdict flag">⚠ ' + total + ' name' + (total > 1 ? 's' : '') + ' flagged on official lists</div>';
+    verdictCls = 'flag';
+    let hits = '';
+    for (const h of r.exact) hits += hitCard(h, 'EXACT');
+    for (const h of r.contain.slice(0, 8)) hits += hitCard(h, 'POSSIBLE');
+    bodyHtml = '<div class="field"><b>Subject checked</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
+      + '<div class="field"><b>Lists checked</b><span>OFAC · UK · EU · UN · BIS</span></div>'
+      + '<div class="field"><b>Data version</b><span>' + DB_TS + '</span></div>'
+      + '<div class="field"><b>Screen time</b><span>' + stamp + '</span></div>'
+      + '<div class="hits">' + hits + '</div>';
   }
-  let html = '<div class="r-hit"><b>' + total + ' name' + (total > 1 ? 's' : '') + ' flagged on official sanctions lists:</b></div>';
-  for (const h of r.exact) html += hitCard(h, 'EXACT');
-  for (const h of r.contain.slice(0, 8)) html += hitCard(h, 'POSSIBLE');
-  box.innerHTML = html + cta;
+
+  box.innerHTML = '<div class="report">'
+    + '<div class="rep-head"><div class="logo">Kehe<span>.</span></div><div class="meta">Auditable Evidence-Chain Screening · ' + stamp.slice(0, 10) + '</div></div>'
+    + verdict + bodyHtml + '</div>';
+
+  // —— 抓邮箱（投入点·紧跟结果出现）——
+  const capture = document.getElementById('leademail');
+  if (capture) {
+    capture.style.display = 'block';
+    const ce = document.getElementById('cap-co');
+    if (ce && qv) ce.value = qv;
+  }
+  // —— $29 证据链报告订阅（含90天状态监控）—— 删掉多价位，只留一个主交易
+  const sub = document.getElementById('suboffer');
+  if (sub) { sub.style.display = 'block'; const se = document.getElementById('sub-co'); if (se && qv) se.value = qv; }
 }
 
 function hitCard(h, tag) {
-  return '<div class="r-card"><span class="tag" style="background:' + srcColor(h.s) + '">' + h.s + '</span> <span class="tag2">' + tag + '</span> <div class="r-name">' + escapeHtml(h.n) + '</div><div class="r-regime">' + escapeHtml(h.r || '') + '</div></div>';
+  const c = srcColor(h.s);
+  return '<div class="hit-row">'
+    + '<span style="color:#fff;background:' + c + ';border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;">' + h.s + '</span> '
+    + '<span style="background:#eee;border-radius:4px;padding:2px 8px;font-size:11px;color:#555;">' + tag + '</span> '
+    + '<div class="r-name">' + escapeHtml(h.n) + '</div>'
+    + '<div class="r-regime">' + escapeHtml(h.r || '') + '</div></div>';
 }
 function escapeHtml(s) { return (s || '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c])); }
 
