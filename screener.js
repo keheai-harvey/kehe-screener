@@ -2,7 +2,7 @@
 // I18N: dynamic report text switches on <html lang>. Static page copy lives in each lang's index.html.
 const I18N = {
   en: {
-    loading: 'Loading sanctions database (104k+ entries, ~1.5MB)...',
+    loading: 'Loading sanctions database (65,337 entries)...',
     loaded: 'Sanctions database loaded: {n} names (OFAC, UK, EU, UN, BIS).',
     failed: 'Database failed to load ({m}). Check again later.',
     verdictNoHit: 'No exact or close match on checked lists',
@@ -14,7 +14,7 @@ const I18N = {
     tagExact: 'EXACT', tagPossible: 'POSSIBLE'
   },
   es: {
-    loading: 'Cargando la base de datos de sanciones (104k+ registros, ~1.5MB)...',
+    loading: 'Cargando la base de datos de sanciones (65,337 registros)...',
     loaded: 'Base de datos cargada: {n} nombres (OFAC, UK, UE, ONU, BIS).',
     failed: 'No se pudo cargar la base de datos ({m}). Inténtalo de nuevo más tarde.',
     verdictNoHit: 'Sin coincidencias exactas ni cercanas en las listas consultadas',
@@ -26,7 +26,7 @@ const I18N = {
     tagExact: 'COINCIDENCIA EXACTA', tagPossible: 'POSIBLE'
   },
   pt: {
-    loading: 'Carregando banco de dados de sanções (104k+ registros, ~1.5MB)...',
+    loading: 'Carregando banco de dados de sanções (65,337 registros)...',
     loaded: 'Banco de dados carregado: {n} nomes (OFAC, Reino Unido, UE, ONU, BIS).',
     failed: 'Não foi possível carregar o banco de dados ({m}). Tente novamente mais tarde.',
     verdictNoHit: 'Sem correspondência exata ou aproximada nas listas consultadas',
@@ -38,7 +38,7 @@ const I18N = {
     tagExact: 'CORRESPONDÊNCIA EXATA', tagPossible: 'POSSÍVEL'
   },
   ar: {
-    loading: 'جارٍ تحميل قاعدة بيانات العقوبات (104k+ سجلات، ~1.5MB)...',
+    loading: 'يتم تحميل قاعدة بيانات العقوبات الآن (65,337 سجلًا)...',
     loaded: 'تم تحميل قاعدة البيانات: {n} اسمًا (OFAC، المملكة المتحدة، الاتحاد الأوروبي، الأمم المتحدة، BIS).',
     failed: 'تعذر تحميل قاعدة البيانات ({m}). حاول مرة أخرى لاحقًا.',
     verdictNoHit: 'لا توجد تطابقات دقيقة أو قريبة في القوائم المدققة',
