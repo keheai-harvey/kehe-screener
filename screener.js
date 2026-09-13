@@ -125,7 +125,7 @@ function trackLead(form) {
   const source = (document.referrer || location.href || '').slice(0, 120) + ' | kind=' + kind;
   const body = { email: email, source: source };
   // fire-and-forget锛氫笉褰卞搷涓昏〃鍗曟甯告彁浜?  try {
-    fetch('https://130.94.44.168:8124/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, mode: 'cors', body: JSON.stringify(body) }).catch(function(){});
+    fetch('https://keheai.com/screener/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, mode: 'cors', body: JSON.stringify(body) }).catch(function(){});
   } catch (e) {}
   // 鏈湴鍚屽睆鐣欑棔锛堜究浜庡嵆鏃跺彲瑙侊級
   try {
