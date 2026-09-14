@@ -7,6 +7,7 @@ const I18N = {
     failed: 'Database failed to load ({m}). Check again later.',
     verdictNoHit: 'No exact or close match on checked lists',
     verdictHit: '{n} name{s} flagged on official lists',
+    verdictSummary: 'Risk check complete — free summary below. Full verified report (with close-match aliases, source links, data version and 90-day monitoring) arrives by email.',
     fieldSubject: 'Subject checked', fieldLists: 'Lists checked',
     fieldVersion: 'Data version', fieldTime: 'Screen time',
     evidNote: 'Clean screen = no flag on these lists. It is <b>not</b> a guarantee — a true compliance file adds registration, ownership and re-check monitoring.',
@@ -19,6 +20,7 @@ const I18N = {
     failed: 'No se pudo cargar la base de datos ({m}). Inténtalo de nuevo más tarde.',
     verdictNoHit: 'Sin coincidencias exactas ni cercanas en las listas consultadas',
     verdictHit: '{n} nombre{s} marcado{s} en listas oficiales',
+    verdictSummary: 'Chequeo de riesgo completado — resumen gratuito abajo. El informe verificado completo (con alias de coincidencia cercana, enlaces a fuentes, versión de datos y seguimiento de 90 días) llega por correo.',
     fieldSubject: 'Entidad verificada', fieldLists: 'Listas consultadas',
     fieldVersion: 'Versión de datos', fieldTime: 'Fecha y hora del chequeo',
     evidNote: 'Pantalla limpia = sin alerta en estas listas. <b>No</b> es una garantía — un expediente de cumplimiento real añade registro, titularidad y seguimiento continuo.',
@@ -31,6 +33,7 @@ const I18N = {
     failed: 'Não foi possível carregar o banco de dados ({m}). Tente novamente mais tarde.',
     verdictNoHit: 'Sem correspondência exata ou aproximada nas listas consultadas',
     verdictHit: '{n} nome{s} sinalizado{s} nas listas oficiais',
+    verdictSummary: 'Verificação de risco concluída — resumo gratuito abaixo. O relatório verificado completo (com aliases de correspondência aproximada, links para fontes, versão dos dados e monitoramento de 90 dias) chega por e-mail.',
     fieldSubject: 'Entidade verificada', fieldLists: 'Listas consultadas',
     fieldVersion: 'Versão dos dados', fieldTime: 'Data e hora da verificação',
     evidNote: 'Triagem limpa = sem sinalização nestas listas. <b>Não</b> é uma garantia — um dossiê real de compliance acrescenta registro, propriedade e monitoramento contínuo.',
@@ -43,6 +46,7 @@ const I18N = {
     failed: 'تعذر تحميل قاعدة البيانات ({m}). حاول مرة أخرى لاحقًا.',
     verdictNoHit: 'لا توجد تطابقات دقيقة أو قريبة في القوائم المدققة',
     verdictHit: '{n} اسم مدرج في القوائم الرسمية',
+    verdictSummary: 'اكتمل فحص المخاطر — الملخص المجاني أدناه. التقرير الكامل الموثَّق (مع الأسماء المتطابقة تقريبًا وروابط المصادر وإصدار البيانات ومراقبة 90 يومًا) يصل عبر البريد الإلكتروني.',
     fieldSubject: 'الكيان المدقَّق', fieldLists: 'القوائم المدققة',
     fieldVersion: 'إصدار البيانات', fieldTime: 'وقت الفحص',
     evidNote: 'شاشة نظيفة = لا يوجد تنبيه في هذه القوائم. <b>هذا ليس</b> ضمانًا — الملف الامتثالي الكامل يضيف السجل والملكية والمراقبة المستمرة.',
@@ -113,17 +117,14 @@ function render(r) {
   const total = r.exact.length + r.contain.length;
   const qv = (document.getElementById('q').value || '').trim();
 
-  // —— 证据链报告（单路径 · 固定结构，内容随查询可变）——
-  const stamp = nowStamp();
+  // —— 免费摘要（收敛完整判定：不给数据版本/逐条来源，给风险等级+方向）——
   let verdict, verdictCls;
-  let bodyHtml;
+  let summaryHtml;
   if (total === 0) {
     verdict = '<div class="verdict ok">✓ ' + t('verdictNoHit') + '</div>';
     verdictCls = 'ok';
-    bodyHtml = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
+    summaryHtml = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
       + '<div class="field"><b>' + t('fieldLists') + '</b><span>OFAC · UK · EU · UN · BIS</span></div>'
-      + '<div class="field"><b>' + t('fieldVersion') + '</b><span>' + DB_TS + '</span></div>'
-      + '<div class="field"><b>' + t('fieldTime') + '</b><span>' + stamp + '</span></div>'
       + '<div class="evid-note">' + t('evidNote') + '</div>';
   } else {
     verdict = '<div class="verdict flag">⚠ ' + fillTpl(t('verdictHit'), { n: total, s: total > 1 ? (lang().tagExact === 'EXACT' ? 's' : '') : '' }) + '</div>';
@@ -131,25 +132,27 @@ function render(r) {
     let hits = '';
     for (const h of r.exact) hits += hitCard(h, t('tagExact'));
     for (const h of r.contain.slice(0, 8)) hits += hitCard(h, t('tagPossible'));
-    bodyHtml = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
+    summaryHtml = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
       + '<div class="field"><b>' + t('fieldLists') + '</b><span>OFAC · UK · EU · UN · BIS</span></div>'
-      + '<div class="field"><b>' + t('fieldVersion') + '</b><span>' + DB_TS + '</span></div>'
-      + '<div class="field"><b>' + t('fieldTime') + '</b><span>' + stamp + '</span></div>'
       + '<div class="hits">' + hits + '</div>';
   }
 
   box.innerHTML = '<div class="report">'
-    + '<div class="rep-head"><div class="logo">Kehe<span>.</span></div><div class="meta">' + t('meta') + ' · ' + stamp.slice(0, 10) + '</div></div>'
-    + verdict + bodyHtml + '</div>';
+    + '<div class="rep-head"><div class="logo">Kehe<span>.</span></div><div class="meta">' + t('meta') + '</div></div>'
+    + verdict + summaryHtml
+    + '<div class="summary-cta" style="margin-top:14px;padding:14px;background:#f0f6ff;border:1px solid #d6e4ff;border-radius:8px;text-align:center;">'
+    + t('verdictSummary')
+    + '</div></div>';
 
-  // —— 抓邮箱（投入点·紧跟结果出现）——
+  // —— 邮箱区块（紧跟摘要，是拿完整报告的唯一入口）——
   const capture = document.getElementById('leademail');
   if (capture) {
     capture.style.display = 'block';
     const ce = document.getElementById('cap-co');
     if (ce && qv) ce.value = qv;
+    try { capture.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
   }
-  // —— $29 证据链报告订阅（含90天状态监控）—— 删掉多价位，只留一个主交易
+  // —— $29 证据链报告订阅（含90天状态监控）—— 只留一个主交易
   const sub = document.getElementById('suboffer');
   if (sub) { sub.style.display = 'block'; const se = document.getElementById('sub-co'); if (se && qv) se.value = qv; }
 }
