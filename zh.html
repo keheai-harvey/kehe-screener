@@ -64,7 +64,7 @@
     <a href="https://creem.io/product/prod_3JzLQsjq0656fM9aVRIFZW" style="background:#2f6fed;">★ 最推荐：深度核查报告 $29（命中即深挖，含来源链接+可存档）</a>
     <a href="https://creem.io/product/prod_HsqrrpRR4lPIK2vOp7RW0" style="background:#1a2233;">完整核查报告 $100（中英双语24h）</a>
     <a href="https://creem.io/product/prod_5u4xrCNUd6pUjKkXWFFrgp" style="background:#6f42c1;">中国供应商核验 $120（英文72h）</a>
-    <p class="fine2" style="margin-top:10px;">中文报告可加微信/邮箱沟通；下单后回复邮件告知要核查的公司名即可。</p>
+    <p class="fine2" style="margin-top:10px;">下单后在支付页或支付后邮件告知要核查的公司英文名即可，报告经邮件交付。</p>
   </div>
 
   <div class="card" id="order">
@@ -95,7 +95,7 @@ let INDEX = null;
 const loading = document.getElementById('idx-status');
 async function loadIndex() {
   try {
-    loading.textContent = '正在加载制裁数据库（10万+条目，约1.5MB）…';
+    loading.textContent = '正在加载制裁数据库（65,337条官方记录，约1.5MB）…';
     const res = await fetch('data/sanctions_index.json.gz');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const buf = await res.arrayBuffer();
