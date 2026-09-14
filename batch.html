@@ -60,7 +60,7 @@ let INDEX = null;
 const loading = document.getElementById('idx-status');
 async function loadIndex() {
   try {
-    loading.textContent = 'Loading sanctions database (104k entries)…';
+    loading.textContent = 'Loading sanctions database (65,337 records)…';
     const res = await fetch('data/sanctions_index.json.gz');
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const buf = await res.arrayBuffer();
