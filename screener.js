@@ -152,7 +152,7 @@ function render(r) {
     if (ce && qv) ce.value = qv;
     try { capture.scrollIntoView({ behavior: 'smooth', block: 'center' }); } catch (e) {}
   }
-  // —— $29 证据链报告订阅（含90天状态监控）—— 只留一个主交易
+  // —— $100 证据链报告订阅（含90天状态监控）—— 只留一个主交易
   const sub = document.getElementById('suboffer');
   if (sub) { sub.style.display = 'block'; const se = document.getElementById('sub-co'); if (se && qv) se.value = qv; }
 }
