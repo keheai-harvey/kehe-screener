@@ -178,24 +178,39 @@ document.getElementById('go').addEventListener('click', runQuery);
 document.getElementById('q').addEventListener('keydown', e => { if (e.key === 'Enter') runQuery(); });
 loadIndex();
 
-// Form-submit tracking. Does NOT change the formsubmit->email forwarding;
-// it only POSTs a count to the VPS /api/lead endpoint + writes localStorage.
+// Form submit -> our own endpoint. formsubmit is no longer in the path:
+// measured 2026-09-18, its forwarding never delivered a single lead.
 function trackLead(form) {
   var em = form.querySelector('input[type="email"], input[name="email"]');
   var email = (em && em.value) ? em.value.trim() : '';
+  var co = form.querySelector('input[name="company"]');
+  var company = (co && co.value) ? co.value.trim() : '';
   var sub = form.querySelector('input[name="_subject"]');
   var kind = sub ? sub.value : '';
   var source = (document.referrer || location.href || '').slice(0, 120) + ' | kind=' + kind;
-  var body = { email: email, source: source };
-  try {
-    fetch('https://keheai.com/screener/api/lead', { method: 'POST', headers: { 'Content-Type': 'application/json' }, mode: 'cors', body: JSON.stringify(body) }).catch(function(){});
-  } catch (e) {}
   try {
     var log = JSON.parse(localStorage.getItem('kehe_lead_log') || '[]');
     log.push({ ts: new Date().toISOString(), email: email, kind: kind });
     localStorage.setItem('kehe_lead_log', JSON.stringify(log));
   } catch (e) {}
+  return fetch('https://keheai.com/screener/api/lead', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    mode: 'cors',
+    keepalive: true,
+    body: JSON.stringify({ email: email, company: company, source: source })
+  });
 }
+// 2026-09-18：不再把用户送去 formsubmit（那一路实测从未送达，且未激活时会在确认页卡住）。
 document.querySelectorAll('form[action*="formsubmit"]').forEach(function(f) {
-  f.addEventListener('submit', function() { trackLead(f); });
+  f.addEventListener('submit', function(ev) {
+    ev.preventDefault();
+    var done = false;
+    var go = function() { if (!done) { done = true; location.href = 'thanks.html'; } };
+    try {
+      var pr = trackLead(f);
+      if (pr && pr.then) { pr.then(go, go); } else { setTimeout(go, 400); }
+      setTimeout(go, 1500);
+    } catch (e) { go(); }
+  });
 });
