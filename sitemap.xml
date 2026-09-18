@@ -31,8 +31,18 @@
     <priority>0.6</priority>
   </url>
   <url>
-    <loc>https://keheai-harvey.github.io/kehe-screener/thanks.html</loc>
-    <changefreq>monthly</changefreq>
-    <priority>0.3</priority>
+    <loc>https://keheai-harvey.github.io/kehe-screener/es/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://keheai-harvey.github.io/kehe-screener/pt/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://keheai-harvey.github.io/kehe-screener/ar/</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 </urlset>
