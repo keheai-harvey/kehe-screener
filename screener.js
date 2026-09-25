@@ -12,7 +12,8 @@ const I18N = {
     fieldVersion: 'Data version', fieldTime: 'Screen time',
     evidNote: 'Clean screen = no flag on these lists. It is <b>not</b> a guarantee — a true compliance file adds registration, ownership and re-check monitoring.',
     meta: 'Auditable Evidence-Chain Screening',
-    tagExact: 'EXACT', tagPossible: 'POSSIBLE'
+    tagExact: 'EXACT', tagPossible: 'POSSIBLE',
+    possibleHeading: 'Possible similar names - not a match, review manually'
   },
   es: {
     loading: 'Cargando la base de datos de sanciones (65,337 registros)...',
@@ -92,7 +93,8 @@ function search(query) {
   if (!exact.length && reduced !== q) exact = INDEX[reduced] || [];
   const qWords = words.filter(w => w.length > 2);
   const contain = [];
-  if (qWords.length) {
+  const allowPossible = qWords.length > 1 || (qWords.length === 1 && qWords[0].length >= 5);
+  if (qWords.length && allowPossible) {
     let checked = 0;
     for (const [k, v] of Object.entries(INDEX)) {
       if (k === q) continue;
@@ -108,33 +110,43 @@ function search(query) {
 
 function srcColor(s) { return s === 'OFAC' ? '#c0392b' : s === 'UK' ? '#1e6f5c' : s === 'UN' ? '#6f42c1' : '#2f6fed'; }
 
+function possibleBlock(list) {
+  let cards = '';
+  for (const h of list.slice(0, 8)) cards += hitCard(h, t('tagPossible'));
+  return '<div class="possible-box" style="margin-top:12px;padding:12px;border:1px solid #e8d27a;background:#fdf8e8;border-radius:8px;">'
+    + '<div style="font-size:13px;font-weight:700;color:#8a6d1a;margin-bottom:6px;">' + t('possibleHeading') + '</div>'
+    + '<div class="hits">' + cards + '</div></div>';
+}
+
 // ⏱ 报告生成时间戳 + 数据版本（可审计证据链要素）
 const DB_TS = '2026-09-12T00:00:00Z';            // 官方名单同步时间（每次更新改此值）
 function nowStamp() { return new Date().toISOString(); }
 
 function render(r) {
   const box = document.getElementById('results');
-  const total = r.exact.length + r.contain.length;
+  const exactCount = r.exact.length;
+  const possibleCount = r.contain.length;
   const qv = (document.getElementById('q').value || '').trim();
 
   // —— 免费摘要（收敛完整判定：不给数据版本/逐条来源，给风险等级+方向）——
   let verdict, verdictCls;
   let summaryHtml;
-  if (total === 0) {
+  if (exactCount === 0) {
     verdict = '<div class="verdict ok">✓ ' + t('verdictNoHit') + '</div>';
     verdictCls = 'ok';
     summaryHtml = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
       + '<div class="field"><b>' + t('fieldLists') + '</b><span>OFAC · UK · EU · UN · BIS</span></div>'
+      + (possibleCount ? possibleBlock(r.contain) : '')
       + '<div class="evid-note">' + t('evidNote') + '</div>';
   } else {
-    verdict = '<div class="verdict flag">⚠ ' + fillTpl(t('verdictHit'), { n: total, s: total > 1 ? (lang().tagExact === 'EXACT' ? 's' : '') : '' }) + '</div>';
+    verdict = '<div class="verdict flag">⚠ ' + fillTpl(t('verdictHit'), { n: exactCount, s: exactCount > 1 ? 's' : '' }) + '</div>';
     verdictCls = 'flag';
     let hits = '';
     for (const h of r.exact) hits += hitCard(h, t('tagExact'));
-    for (const h of r.contain.slice(0, 8)) hits += hitCard(h, t('tagPossible'));
     summaryHtml = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
       + '<div class="field"><b>' + t('fieldLists') + '</b><span>OFAC · UK · EU · UN · BIS</span></div>'
-      + '<div class="hits">' + hits + '</div>';
+      + '<div class="hits">' + hits + '</div>'
+      + (possibleCount ? possibleBlock(r.contain) : '');
   }
 
   box.innerHTML = '<div class="report">'
