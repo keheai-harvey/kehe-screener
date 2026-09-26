@@ -5,7 +5,7 @@ const I18N = {
     loading: 'Loading sanctions database (65,337 entries)...',
     loaded: 'Sanctions database loaded: {n} names (OFAC, UK, EU, UN, BIS).',
     failed: 'Database failed to load ({m}). Check again later.',
-    verdictNoHit: 'No exact or close match on checked lists',
+    verdictNoHit: 'No exact match on checked lists',
     verdictHit: '{n} name{s} flagged on official lists',
     verdictSummary: 'Risk check complete — free summary below. Full verified report (with close-match aliases, source links, data version and 90-day monitoring) arrives by email.',
     fieldSubject: 'Subject checked', fieldLists: 'Lists checked',
@@ -13,13 +13,15 @@ const I18N = {
     evidNote: 'Clean screen = no flag on these lists. It is <b>not</b> a guarantee — a true compliance file adds registration, ownership and re-check monitoring.',
     meta: 'Auditable Evidence-Chain Screening',
     tagExact: 'EXACT', tagPossible: 'POSSIBLE',
-    possibleHeading: 'Possible similar names - not a match, review manually'
+    possibleHeading: 'Possible similar names - not a match, review manually',
+    tagStrong: 'STRONG MATCH',
+    verdictCaution: '{n} close name{s} on official lists - verify identity before transacting'
   },
   es: {
     loading: 'Cargando la base de datos de sanciones (65,337 registros)...',
     loaded: 'Base de datos cargada: {n} nombres (OFAC, UK, UE, ONU, BIS).',
     failed: 'No se pudo cargar la base de datos ({m}). Inténtalo de nuevo más tarde.',
-    verdictNoHit: 'Sin coincidencias exactas ni cercanas en las listas consultadas',
+    verdictNoHit: 'Sin coincidencias exactas en las listas consultadas',
     verdictHit: '{n} nombre{s} marcado{s} en listas oficiales',
     verdictSummary: 'Chequeo de riesgo completado — resumen gratuito abajo. El informe verificado completo (con alias de coincidencia cercana, enlaces a fuentes, versión de datos y seguimiento de 90 días) llega por correo.',
     fieldSubject: 'Entidad verificada', fieldLists: 'Listas consultadas',
@@ -32,7 +34,7 @@ const I18N = {
     loading: 'Carregando banco de dados de sanções (65,337 registros)...',
     loaded: 'Banco de dados carregado: {n} nomes (OFAC, Reino Unido, UE, ONU, BIS).',
     failed: 'Não foi possível carregar o banco de dados ({m}). Tente novamente mais tarde.',
-    verdictNoHit: 'Sem correspondência exata ou aproximada nas listas consultadas',
+    verdictNoHit: 'Sem correspondência exata nas listas consultadas',
     verdictHit: '{n} nome{s} sinalizado{s} nas listas oficiais',
     verdictSummary: 'Verificação de risco concluída — resumo gratuito abaixo. O relatório verificado completo (com aliases de correspondência aproximada, links para fontes, versão dos dados e monitoramento de 90 dias) chega por e-mail.',
     fieldSubject: 'Entidade verificada', fieldLists: 'Listas consultadas',
@@ -45,7 +47,7 @@ const I18N = {
     loading: 'يتم تحميل قاعدة بيانات العقوبات الآن (65,337 سجلًا)...',
     loaded: 'تم تحميل قاعدة البيانات: {n} اسمًا (OFAC، المملكة المتحدة، الاتحاد الأوروبي، الأمم المتحدة، BIS).',
     failed: 'تعذر تحميل قاعدة البيانات ({m}). حاول مرة أخرى لاحقًا.',
-    verdictNoHit: 'لا توجد تطابقات دقيقة أو قريبة في القوائم المدققة',
+    verdictNoHit: 'لا توجد تطابقات دقيقة في القوائم المدققة',
     verdictHit: '{n} اسم مدرج في القوائم الرسمية',
     verdictSummary: 'اكتمل فحص المخاطر — الملخص المجاني أدناه. التقرير الكامل الموثَّق (مع الأسماء المتطابقة تقريبًا وروابط المصادر وإصدار البيانات ومراقبة 90 يومًا) يصل عبر البريد الإلكتروني.',
     fieldSubject: 'الكيان المدقَّق', fieldLists: 'القوائم المدققة',
@@ -82,7 +84,8 @@ async function loadIndex() {
 
 function norm(s) { return (s || '').toLowerCase().replace(/[^a-z0-9\u4e00-\u9fa5]+/g, ' ').trim(); }
 
-const SUF = ['ltd','limited','inc','corp','corporation','gmbh','ag','co','llc','bv','sa','plc','srl','pty','pte','holding','group','international','global'];
+const SUF = ['ltd','limited','inc','corp','corporation','gmbh','ag','co','llc','bv','sa','plc','srl','pty','pte','holding','group','international','global',
+  'company','stock','public','jsc','pjsc','ojsc','oao','pao','zao','ao','enterprises','enterprise','industries'];
 
 function search(query) {
   const q = norm(query);
@@ -92,6 +95,7 @@ function search(query) {
   const reduced = words.join(' ');
   if (!exact.length && reduced !== q) exact = INDEX[reduced] || [];
   const qWords = words.filter(w => w.length > 2);
+  const qSet = new Set(qWords);
   const contain = [];
   const allowPossible = qWords.length > 1 || (qWords.length === 1 && qWords[0].length >= 5);
   if (qWords.length && allowPossible) {
@@ -99,7 +103,13 @@ function search(query) {
     for (const [k, v] of Object.entries(INDEX)) {
       if (k === q) continue;
       if (qWords.every(w => k.includes(w))) {
-        for (const x of v) contain.push(Object.assign({ key: k }, x));
+        const kCore = k.split(' ').filter(tok => !SUF.includes(tok) && tok.length > 2);
+        const kSet = new Set(kCore);
+        const ORG_WORDS = new Set(['open','joint']);
+        let sameCore = true;
+        for (const w of qWords) if (!kSet.has(w)) { sameCore = false; break; }
+        if (sameCore) for (const tok of kCore) if (!qSet.has(tok) && !ORG_WORDS.has(tok)) { sameCore = false; break; }
+        for (const x of v) contain.push(Object.assign({ key: k, strong: sameCore }, x));
         if (contain.length >= 8) break;
       }
       if (++checked > 80000) break; // 性能保护
@@ -131,22 +141,31 @@ function render(r) {
   // —— 免费摘要（收敛完整判定：不给数据版本/逐条来源，给风险等级+方向）——
   let verdict, verdictCls;
   let summaryHtml;
-  if (exactCount === 0) {
-    verdict = '<div class="verdict ok">✓ ' + t('verdictNoHit') + '</div>';
-    verdictCls = 'ok';
-    summaryHtml = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
-      + '<div class="field"><b>' + t('fieldLists') + '</b><span>OFAC · UK · EU · UN · BIS</span></div>'
-      + (possibleCount ? possibleBlock(r.contain) : '')
-      + '<div class="evid-note">' + t('evidNote') + '</div>';
-  } else {
+  const strong = r.contain.filter(h => h.strong);
+  const weak = r.contain.filter(h => !h.strong);
+  const head = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
+    + '<div class="field"><b>' + t('fieldLists') + '</b><span>OFAC · UK · EU · UN · BIS</span></div>';
+  const strongCards = () => { let cards = ''; for (const h of strong) cards += hitCard(h, t('tagStrong')); return '<div class="hits">' + cards + '</div>'; };
+  if (exactCount > 0) {
     verdict = '<div class="verdict flag">⚠ ' + fillTpl(t('verdictHit'), { n: exactCount, s: exactCount > 1 ? 's' : '' }) + '</div>';
     verdictCls = 'flag';
     let hits = '';
     for (const h of r.exact) hits += hitCard(h, t('tagExact'));
-    summaryHtml = '<div class="field"><b>' + t('fieldSubject') + '</b><span class="r-escape">' + escapeHtml(qv) + '</span></div>'
-      + '<div class="field"><b>' + t('fieldLists') + '</b><span>OFAC · UK · EU · UN · BIS</span></div>'
-      + '<div class="hits">' + hits + '</div>'
-      + (possibleCount ? possibleBlock(r.contain) : '');
+    summaryHtml = head + '<div class="hits">' + hits + '</div>'
+      + (strong.length ? strongCards() : '')
+      + (weak.length ? possibleBlock(weak) : '');
+  } else if (strong.length) {
+    verdict = '<div class="verdict" style="background:#b8860b;">⚠ ' + fillTpl(t('verdictCaution'), { n: strong.length, s: strong.length > 1 ? 's' : '' }) + '</div>';
+    verdictCls = 'caution';
+    summaryHtml = head + strongCards()
+      + (weak.length ? possibleBlock(weak) : '')
+      + '<div class="evid-note">' + t('evidNote') + '</div>';
+  } else {
+    verdict = '<div class="verdict ok">✓ ' + t('verdictNoHit') + '</div>';
+    verdictCls = 'ok';
+    summaryHtml = head
+      + (weak.length ? possibleBlock(weak) : '')
+      + '<div class="evid-note">' + t('evidNote') + '</div>';
   }
 
   box.innerHTML = '<div class="report">'
